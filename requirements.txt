@@ -1,6 +1,6 @@
 pandas
 numpy
 matplotlib
-scikit-learn==1.7.0
-xgboost==3.0.2
+scikit-learn
+xgboost
 streamlit
