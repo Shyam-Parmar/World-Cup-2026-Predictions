@@ -278,7 +278,7 @@ with tab_backtest:
 
         st.dataframe(
             df_bt_show[display_cols].style
-                .applymap(color_correct, subset=["correct"])
+                .map(color_correct, subset=["correct"])
                 .format({"prob_home_win": "{}%", "prob_draw": "{}%", "prob_away_win": "{}%"}),
             use_container_width=True,
             hide_index=True,
