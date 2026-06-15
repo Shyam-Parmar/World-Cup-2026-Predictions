@@ -1,27 +1,22 @@
 """
 World Cup 2026 Prediction Dashboard
 
-Loads the trained model from wc2026_model.pkl, then on each run:
-  - refetches the latest results CSV from RAW_URL
+Trains the model fresh on startup, then on each run:
+  - fetches the latest results CSV from RAW_URL
   - rebuilds features for completed and upcoming matches
   - predicts upcoming fixtures
   - backtests WC 2026 matches that now have scores
 
-The model is NOT retrained here. Only the data and features are refreshed,
-so newly played matches flow into the backtest automatically.
-
+Newly played matches flow into the backtest automatically.
 Requires wc2026.py (the training script) in the same folder.
 """
 
+import os
 import sys
-import pickle
 import pandas as pd
 import streamlit as st
-from pathlib import Path
 
-# Make this script's own folder importable, so `import wc2026` works no matter
-# what the current working directory is (matters for Box / synced paths).
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import wc2026 as wc   # feature engineering + constants from the training script
 
@@ -35,27 +30,6 @@ RESULT_LABELS = {
     "draw"    : "Draw",
     "away_win": "Away Win",
 }
-
-
-# =========================
-# Load Model & Build Live Data
-# =========================
-
-@st.cache_resource
-def load_model(path):
-    with open(path, "rb") as f:
-        return pickle.load(f)
-
-
-@st.cache_data(ttl=DATA_TTL, show_spinner="Fetching latest results and rebuilding features...")
-def build_live_data():
-    """Refetch the CSV and rebuild features. Cached so it only runs on first load or after TTL."""
-    df_hist, df_upcoming = wc.load_data(wc.RAW_URL)
-    df_features = wc.build_feature_matrix(df_hist)
-    df_predict  = wc.build_upcoming_features(df_upcoming, df_hist)
-    last_played = df_hist["date"].max()
-    return df_features, df_predict, last_played
-
 
 # =========================
 # Prediction Helpers
