@@ -41,7 +41,7 @@ A machine learning model that predicts World Cup 2026 match outcomes (home win /
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/wc2026-predictor.git
+git clone https://github.com/your-username/World-Cup-2026-Predictions.git
 cd wc2026-predictor
 ```
 
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 ### 3. Train the model
 
 ```bash
-python model.py
+python wc2026.py
 ```
 
 This fetches the latest data, trains the model, and saves `wc2026_model.pkl` locally.
@@ -62,7 +62,7 @@ This fetches the latest data, trains the model, and saves `wc2026_model.pkl` loc
 ### 4. Run the Streamlit app
 
 ```bash
-streamlit run app.py
+streamlit run wc2026_dashboard.py
 ```
 
 ---
