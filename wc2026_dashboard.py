@@ -141,19 +141,20 @@ def label_result(row, col):
 st.set_page_config(page_title="WC 2026 Predictions", page_icon="⚽", layout="wide")
 st.title("⚽ FIFA World Cup 2026 — Match Predictions")
 
-# -- Model --
-if not PKL_PATH.exists():
-    st.error(f"Model file not found at: {PKL_PATH}\nRun wc2026.py first to generate wc2026_model.pkl.")
-    st.stop()
+@st.cache_resource(show_spinner="Training model on latest data...")
+def load_model_and_data():
+    df_hist, df_upcoming = wc.load_data(wc.RAW_URL)
+    df_features  = wc.build_feature_matrix(df_hist)
+    df_predict   = wc.build_upcoming_features(df_upcoming, df_hist)
+    last_played  = df_hist["date"].max()
+    X_train, X_test, y_train, y_test = wc.split_data(df_features)
+    clf_pipeline, _, le, clf_classes, _, _, _ = \
+        wc.train_calibrated_classifier(X_train, y_train, X_test, y_test)
+    return clf_pipeline, clf_classes, df_features, df_predict, last_played
 
-data             = load_model(PKL_PATH)
-clf_pipeline     = data["clf_pipeline"]
-clf_classes      = data["clf_classes"]
-FEATURE_COLS     = data["FEATURE_COLS"]
-TOURNAMENT_START = data["TOURNAMENT_START"]
-
-# -- Live data --
-df_features, df_predict, last_played = build_live_data()
+clf_pipeline, clf_classes, df_features, df_predict, last_played = load_model_and_data()
+FEATURE_COLS     = wc.FEATURE_COLS
+TOURNAMENT_START = wc.TOURNAMENT_START
 
 df_results  = get_predictions(clf_pipeline, clf_classes, df_predict, FEATURE_COLS)
 df_backtest = get_backtest(clf_pipeline, clf_classes, df_features, FEATURE_COLS, TOURNAMENT_START)
