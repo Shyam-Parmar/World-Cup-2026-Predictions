@@ -30,9 +30,6 @@ import wc2026 as wc   # feature engineering + constants from the training script
 # Config
 # =========================
 
-PKL_PATH = Path(__file__).parent / "wc2026_model.pkl"
-DATA_TTL = 1800   # seconds before cached data is refetched (30 min)
-
 RESULT_LABELS = {
     "home_win": "Home Win",
     "draw"    : "Draw",
