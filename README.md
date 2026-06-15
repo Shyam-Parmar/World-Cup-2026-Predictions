@@ -27,10 +27,10 @@ A machine learning model that predicts World Cup 2026 match outcomes (home win /
 ## Project Structure
 
 ```
-├── model.py          # Feature engineering, training, and prediction pipeline
-├── app.py            # Streamlit app for displaying predictions
-├── requirements.txt  # Python dependencies
-├── .gitignore        # Excludes wc2026_model.pkl
+├── wc2026.py            # Feature engineering, training, and prediction pipeline
+├── wc2026_dashboard.py  # Streamlit app for displaying predictions
+├── requirements.txt     # Python dependencies
+├── .gitignore           # Excludes wc2026_model.pkl
 └── README.md
 ```
 
