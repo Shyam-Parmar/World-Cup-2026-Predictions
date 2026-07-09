@@ -16,6 +16,14 @@ Two model variants are included:
 - **Group stage / general model** (`wc2026.py`): three way classifier (home win, draw, away win)
 - **Knockout stage model** (`wc2026_knockout.py`): binary classifier (home win, away win). Draws are dropped from training since a real knockout match always ends in a winner after extra time or penalties.
 
+On top of the knockout model sits a **full bracket simulation** (`wc2026_bracket_simulation.py`), which walks the actual Round of 32 to Final bracket:
+
+- The Round of 32 pairings are hardcoded, since bracket topology cannot be derived from a results only dataset
+- For each matchup, it checks history first. If the match already happened, the real result decides the winner
+- If not played but already scheduled, the real fixture is predicted
+- If not yet in the data at all, a fixture is simulated on the expected venue date using the winners already resolved from earlier rounds
+- This repeats round by round (Round of 32 → Round of 16 → Quarterfinal → Semifinal → Final) until a predicted champion comes out the other end
+
 ---
 
 ## Features Used
@@ -32,16 +40,18 @@ Two model variants are included:
 ## Project Structure
 
 ```
-├── wc2026.py                      # Feature engineering, training, and prediction pipeline (group stage, 3-way)
-├── wc2026_dashboard.py            # Streamlit app for group stage predictions
-├── wc2026_knockout.py             # Binary (no-draw) model for knockout stage matches, built on wc2026.py
-├── wc2026_knockout_dashboard.py   # Streamlit app for knockout stage predictions
-├── requirements.txt               # Python dependencies
-├── .devcontainer/                 # Dev container config
+├── wc2026.py                            # Feature engineering, training, and prediction pipeline (group stage, 3-way)
+├── wc2026_dashboard.py                  # Streamlit app for group stage predictions
+├── wc2026_knockout.py                   # Binary (no-draw) model for knockout stage matches, built on wc2026.py
+├── wc2026_knockout_dashboard.py         # Streamlit app for knockout stage predictions
+├── wc2026_bracket_simulation.py         # Walks the real Round of 32 to Final bracket using the knockout model, prints results to console
+├── wc2026_bracket_simulation_dashboard.py  # Streamlit app version of the bracket simulation
+├── requirements.txt                     # Python dependencies
+├── LICENSE
 └── README.md
 ```
 
-`wc2026_knockout.py` imports shared data loading and feature engineering functions from `wc2026.py`, so `wc2026.py` must be present in the same folder.
+`wc2026_knockout.py`, `wc2026_bracket_simulation.py`, and `wc2026_bracket_simulation_dashboard.py` all import shared data loading and feature engineering functions from `wc2026.py`, so `wc2026.py` must be present in the same folder. The two bracket simulation files also depend on `wc2026_knockout_model.pkl`, so train the knockout model first.
 
 ---
 
@@ -92,6 +102,24 @@ streamlit run wc2026_knockout_dashboard.py
 
 The knockout dashboard trains fresh on startup, then shows upcoming fixtures, played matches with prediction accuracy, and overall model summary across three tabs.
 
+### 5. Run the full bracket simulation
+
+Console version:
+
+```
+python wc2026_bracket_simulation.py
+```
+
+This trains (or loads) `wc2026_knockout_model.pkl`, then walks every round from Round of 32 to the Final, printing each matchup, win probabilities, and the resolved winner, ending with a predicted champion.
+
+Dashboard version:
+
+```
+streamlit run wc2026_bracket_simulation_dashboard.py
+```
+
+Same bracket walk logic, displayed as an interactive bracket in the browser instead of console output.
+
 ---
 
 ## Requirements
@@ -112,6 +140,7 @@ The knockout dashboard trains fresh on startup, then shows upcoming fixtures, pl
 - Both models use a time based train/test split (cutoff: 2018-01-01)
 - Probabilities are calibrated using isotonic regression
 - The knockout model drops all regular time draws before training, since knockout matches are decided by extra time or penalties
+- The bracket simulation hardcodes only the Round of 32 pairings, since bracket shape is not present in a results only dataset. Everything else (results, fixtures, predictions) stays dynamic
 - Model `.pkl` files are excluded from version control via `.gitignore`
 
 ---
