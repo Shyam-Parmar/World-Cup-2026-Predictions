@@ -2,6 +2,8 @@
 
 A machine learning model that predicts World Cup 2026 match outcomes using historical international results, ELO ratings, rolling form, and head to head records. Streamlit apps display live predictions and probabilities for both group stage and knockout stage matches.
 
+Live demo: world-cup-2026-predictions.streamlit.app
+
 ---
 
 ## How It Works
